@@ -1,0 +1,19 @@
+{
+  "name": "web-serial-pelt",
+  "version": "1.0.0",
+  "description": "produktions-helper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify ./main.js > dist/bundle.js",
+    "watch": "watchify main.js -o dist/bundle.js",
+    "host": "http-server -p 3000 --cors ./dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^16.5.1",
+    "http-server": "^0.12.3",
+    "watchify": "^3.11.1"
+  }
+}
