@@ -3,7 +3,7 @@ let port2;
 
 async function test_2() {
     port2 = await navigator.serial.requestPort();
-    await port2.open({ baudrate: 9600 });
+    await port2.open({ baudRate: 9600 });
     let result;
     let decoder = new TextDecoderStream();
     inputDone = port2.readable.pipeTo(decoder.writable);
@@ -23,16 +23,19 @@ async function test_2() {
             try {
                 console.log(result_string);
                 result = JSON.parse(result_string);
-                console.log("1");
-                writer.write(JSON.stringify(result));
-                
-                console.log("2");
                 result_string = "";
+                console.log(result["FIN"]);
+                if(result["BTST"] != undefined){
+                    console.log("called1");
+                    writer.write(JSON.stringify(result));
+                }                
+                console.log("2");
+                
                 if(result["FIN"] == 1){
                     generateDynamicTable(result);
                 }
             } catch (error) {
-                
+                //console.log(error);
             }
         }
         if (done) {
