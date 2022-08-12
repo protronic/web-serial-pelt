@@ -19,9 +19,11 @@ async function test_2() {
         const { value, done } = await reader.read();
         if (value) {
             result_string += value;
-
             try {
                 console.log(result_string);
+                if(result_string.indexOf("{") != -1 && result_string.indexOf("}") != -1){
+                    result_string = result_string.substring(result_string.indexOf("{"), result_string.indexOf("}") + 1);
+                }
                 result = JSON.parse(result_string);
                 result_string = "";
                 console.log(result["FIN"]);
