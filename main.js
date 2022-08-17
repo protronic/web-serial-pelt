@@ -21,19 +21,22 @@ async function test_2() {
             try {
                 console.log(result_string);
                 if(result_string.indexOf("{") != -1 && result_string.indexOf("}") != -1){
-                    result_string = result_string.substring(result_string.indexOf("{"), result_string.indexOf("}") + 1);
-                }
-                result = JSON.parse(result_string);
-                result_string = "";
-                console.log(result["FIN"]);
-                if(result["BTST"] != undefined){
-                    console.log("called1");
-                    writer.write(JSON.stringify(result));
-                }                
-                console.log("2");
-                
-                if(result["FIN"] == 1){
-                    generateDynamicTable(result);
+                    try {
+                        result_string = result_string.substring(result_string.indexOf("{"), result_string.indexOf("}") + 1);
+                        result = JSON.parse(result_string);
+                        console.log(result["FIN"]);
+                        if(result["BTST"] != undefined){
+                            console.log("called1");
+                            writer.write(JSON.stringify(result));
+                        }                
+                        console.log("2");
+                        
+                        if(result["FIN"] == 1){
+                            generateDynamicTable(result);
+                        }
+                    } catch (error) {
+                        result_string = "";
+                    }
                 }
             } catch (error) {
                 //console.log(error);
