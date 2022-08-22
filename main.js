@@ -34,6 +34,7 @@ async function test_2() {
                         if(result["FIN"] == 1){
                             generateDynamicTable(result);
                         }
+                        result_string = "";
                     } catch (error) {
                         result_string = "";
                     }
