@@ -29,7 +29,7 @@ async function test_2() {
                         console.log(result["FIN"]);
                         if (result["BTST"] != undefined) {
                             console.log("called1");
-                            await sleep(150);
+                            await sleep(200);
                             writer.write(JSON.stringify(result));
                         }
                         console.log("2");
