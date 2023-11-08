@@ -1,6 +1,8 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 let port2;
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 async function test_2() {
     port2 = await navigator.serial.requestPort();
     await port2.open({ baudRate: 9600 });
@@ -21,18 +23,19 @@ async function test_2() {
             result_string += value;
             try {
                 console.log(result_string);
-                if(result_string.indexOf("{") != -1 && result_string.indexOf("}") != -1){
+                if (result_string.indexOf("{") != -1 && result_string.indexOf("}") != -1) {
                     try {
                         result_string = result_string.substring(result_string.indexOf("{"), result_string.indexOf("}") + 1);
                         result = JSON.parse(result_string);
                         console.log(result["FIN"]);
-                        if(result["BTST"] != undefined){
+                        if (result["BTST"] != undefined) {
                             console.log("called1");
+                            await sleep(150);
                             writer.write(JSON.stringify(result));
-                        }                
+                        }
                         console.log("2");
-                        
-                        if(result["FIN"] == 1){
+
+                        if (result["FIN"] == 1) {
                             generateDynamicTable(result);
                         }
                         result_string = "";
@@ -67,28 +70,28 @@ function generateDynamicTable(result) {
     th2.appendChild(txt2);
     tr.appendChild(th1);
     tr.appendChild(th2);
-    
+
     table.appendChild(tr);
     for (var i = 1; i < Object.keys(result).length; i++) {
         tr = document.createElement('tr');
 
         var td1 = document.createElement('td');
-        td1.style.border="2px solid black";
+        td1.style.border = "2px solid black";
         var td2 = document.createElement('td');
-        td2.style.border="2px solid black";
+        td2.style.border = "2px solid black";
 
-        if(result[Object.keys(result)[i]]){
-            td2.style.backgroundColor="green";
-        }else{
-            td2.style.backgroundColor="red";
+        if (result[Object.keys(result)[i]]) {
+            td2.style.backgroundColor = "green";
+        } else {
+            td2.style.backgroundColor = "red";
         }
 
         var t = document.createElement("span");
-        t.innerText = Object.keys(result)[i];  
+        t.innerText = Object.keys(result)[i];
         t.style.color = "black";
-        
+
         var t2 = document.createElement("span");
-        t2.innerText = result[Object.keys(result)[i]];  
+        t2.innerText = result[Object.keys(result)[i]];
         t2.style.color = "black";
 
         td1.appendChild(t);
@@ -101,7 +104,7 @@ function generateDynamicTable(result) {
     document.body.appendChild(table);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#test_btn').addEventListener('click', test_2);
 });
 },{}]},{},[1]);
