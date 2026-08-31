@@ -1,3 +1,5 @@
 *node_modules*
 *release-builds*
 *win32-x64*
+*peltier-2-rev1*
+dist/bundle.js

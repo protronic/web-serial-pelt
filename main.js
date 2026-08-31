@@ -16,7 +16,12 @@ async function test_2() {
     outputDone = encoder.readable.pipeTo(port2.writable);
     outputStream = encoder.writable;
     const writer = outputStream.getWriter();
+    // let start = performance.now();
     while (true) {
+        // const timeoutPromise = new Promise((_, reject) =>
+        //     setTimeout(() => reject(new Error("reader.read() timeout")), 30000)
+        // );
+        // const { value, done } = await Promise.race([reader.read(), timeoutPromise]);
         const { value, done } = await reader.read();
         if (value) {
             result_string += value;
@@ -24,26 +29,34 @@ async function test_2() {
                 console.log(result_string);
                 if (result_string.indexOf("{") != -1 && result_string.indexOf("}") != -1) {
                     try {
-                        result_string = result_string.substring(result_string.indexOf("{"), result_string.indexOf("}") + 1);
+                        result_string = result_string.substring(result_string.lastIndexOf("{"), result_string.indexOf("}") + 1);
                         result = JSON.parse(result_string);
-                        console.log(result["FIN"]);
-                        if (result["BTST"] != undefined) {
-                            console.log("called1");
+                        console.log(result);
+                        // console.log(result["FIN"]);
+
+                        if (result["FIN"] == 1) {
+                            console.log("Test Abgeschloßen.");
+                            generateDynamicTable(result, true);
+                        } else {
+                            generateDynamicTable(result, false);
+                        }
+
+                        if (result["BTST"] != undefined && result["FIN"] != 1) {
+                            console.log("submit test...");
                             await sleep(200);
                             writer.write(JSON.stringify(result));
                         }
+
                         console.log("2");
 
-                        if (result["FIN"] == 1) {
-                            generateDynamicTable(result);
-                        }
                         result_string = "";
                     } catch (error) {
                         result_string = "";
+                        console.error(error);
                     }
                 }
             } catch (error) {
-                //console.log(error);
+                // console.error(error);
             }
         }
         if (done) {
@@ -55,52 +68,58 @@ async function test_2() {
 }
 
 
-function generateDynamicTable(result) {
+function generateDynamicTable(result, finished) {
 
-    var table = document.createElement('table');
-    var tr = document.createElement('tr');
-    var th1 = document.createElement('th');
-    var th2 = document.createElement('th');
+    if(Object.keys(result)[0] == "UCID"){
+        document.querySelector('#table')?.remove();
+        
+        var table = document.createElement('table');
+        table.id = "table";
 
-    var txt1 = document.createTextNode('TEST');
-    var txt2 = document.createTextNode('STATUS');
+        var tr = document.createElement('tr');
+        var th1 = document.createElement('th');
+        var th2 = document.createElement('th');
 
-    th1.appendChild(txt1);
-    th2.appendChild(txt2);
-    tr.appendChild(th1);
-    tr.appendChild(th2);
+        var txt1 = document.createTextNode('TEST');
+        var txt2 = document.createTextNode('STATUS');
 
-    table.appendChild(tr);
-    for (var i = 1; i < Object.keys(result).length; i++) {
-        tr = document.createElement('tr');
-
-        var td1 = document.createElement('td');
-        td1.style.border = "2px solid black";
-        var td2 = document.createElement('td');
-        td2.style.border = "2px solid black";
-
-        if (result[Object.keys(result)[i]]) {
-            td2.style.backgroundColor = "green";
-        } else {
-            td2.style.backgroundColor = "red";
-        }
-
-        var t = document.createElement("span");
-        t.innerText = Object.keys(result)[i];
-        t.style.color = "black";
-
-        var t2 = document.createElement("span");
-        t2.innerText = result[Object.keys(result)[i]];
-        t2.style.color = "black";
-
-        td1.appendChild(t);
-        td2.appendChild(t2);
-        tr.appendChild(td1);
-        tr.appendChild(td2);
+        th1.appendChild(txt1);
+        th2.appendChild(txt2);
+        tr.appendChild(th1);
+        tr.appendChild(th2);
 
         table.appendChild(tr);
+        for (var i = 1; i < Object.keys(result).length; i++) {
+            tr = document.createElement('tr');
+
+            var td1 = document.createElement('td');
+            td1.style.border = "2px solid black";
+            var td2 = document.createElement('td');
+            td2.style.border = "2px solid black";
+
+            if (result[Object.keys(result)[i]]) {
+                td2.style.backgroundColor = "green";
+            } else {
+                td2.style.backgroundColor = finished ? "red" : "lightgray";
+            }
+
+            var t = document.createElement("span");
+            t.innerText = Object.keys(result)[i];
+            t.style.color = "black";
+
+            var t2 = document.createElement("span");
+            t2.innerText = result[Object.keys(result)[i]];
+            t2.style.color = "black";
+
+            td1.appendChild(t);
+            td2.appendChild(t2);
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+
+            table.appendChild(tr);
+        }
+        document.body.appendChild(table);
     }
-    document.body.appendChild(table);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
